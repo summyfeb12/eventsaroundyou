@@ -1,69 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title> D3 page template </title>     
+    <title> Events Around You </title>     
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
      <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
      <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
      <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>  
-  </head>
-<style>
-.d3-tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  border-radius: 2px;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips differently */
-.d3-tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
-}
-.arc text {
-  font: 10px sans-serif;
-  text-anchor: middle;
-}
-
-.arc path {
-  stroke: #fff;
-}
-
-</style>
-<style>
-.axis {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  display: none;
-}
-
-</style>    
+     <link rel="stylesheet" href="assets/css/sample.css" />  
+      <script src="assets/js/gplaces.js"></script>
+      <script src="assets/js/pie.js"></script>
+      <script src="assets/js/bar.js"></script>
+  </head>   
   <body>
 <div id="container" style="width:100%;height:95vh;">
     <div style="width:70%; margin: 0 auto;"><label for="locationTextField">Enter your address or zip</label>
@@ -74,25 +22,7 @@
     <div id="piecont" style="float:left; width:50%; height: 100%;"></div>
     <div id="barcont" style="float:right; width:50%; height: 100%;"></div>
 </div>     
-        <script>
-            function init() {
-                var input = document.getElementById('locationTextField');
-                var autocomplete = new google.maps.places.Autocomplete(input);
-                google.maps.event.addListener(autocomplete, 'place_changed',
-                function() {
-                var place = autocomplete.getPlace();
-                var lat = place.geometry.location.lat();
-                var lng = place.geometry.location.lng();
-                $("progress").animate({ value: "0" }, 1);    
-                events(lat,lng);    
-                console.log(lat);
-                console.log(lng);    
-                }
-                                             );
-            }
- 
-            google.maps.event.addDomListener(window, 'load', init);
-        </script>      
+             
 <script type="text/javascript"> 
 var totdata;
 var cate=[
@@ -189,9 +119,9 @@ function events(lat,lng)
 	async: false,
 	success:function(data)  //fetching data for each genre
 		{
-			console.log(data);
+			//console.log(data);
            
-            console.log(data.pagination.page_count);
+            //console.log(data.pagination.page_count);
             var tempy=100/data.pagination.page_count;
             for(l=0;l<data.pagination.page_count;l++)
             $("progress").animate({ value: "+="+tempy }, 1);
@@ -210,7 +140,7 @@ function events(lat,lng)
             } 
             var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%SZ").parse;
             var monthNameFormat = d3.time.format("%b");
-            console.log(pdata);
+            //console.log(pdata);
             pdata.forEach(function(d){
             d.month = monthNameFormat(parseDate(d.start.utc));
             });
@@ -226,252 +156,7 @@ function events(lat,lng)
 		}
 	});
 }
-    
-function drawpie(data)
-{
-d3.select("#piecont").selectAll('*').remove();     
-var data = d3.nest().key(function(d) 
-                                      {
-                                        if(d.category_id==null)
-                                         return "199";
-                                        else
-                                        return d.category_id;    
-                                      })
-.entries(data);
-            
-            
-        data.forEach(function(d)
-        {
-            for(k=0;k<cate.length;k++)
-                if(d.key==cate[k].id)
-                {
-                    d.key=cate[k].name;
-                }
-        });    
-var margin = {top: 20, right: 20, bottom: 10, left: 40};
-var width=$('#piecont').width()- margin.left - margin.right;
-var height=$('#piecont').height()- margin.top - margin.bottom;
-var radius = Math.min(width, height) / 2 - 50;
+   
 
-var color = d3.scale.category20b();
-
-var arc = d3.svg.arc()
-    .outerRadius(radius - 10)
-    .innerRadius(0);
-
-var labelArc = d3.svg.arc()
-    .outerRadius(radius-40)
-    .innerRadius(radius);
-
-var pie = d3.layout.pie()
-    .sort(null)
-    .value(function(d) { return d.values.length; });
-
-var svg = d3.select("#piecont").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-  .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-    
-svg.append("text")
-            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (0) +","+(-height/2.38)+")")  // centre below axis
-            .text("Click on the pie to see number of events in particular category");    
-  var g = svg.selectAll(".arc")
-      .data(pie(data))
-    .enter().append("g")
-      .attr("class", "arc");
-
-  g.append("path")
-      .attr("d", arc)
-      .style("fill", function(d) { return color(d.data.key); })
-  .on("click", function(d) {
-          var col=color(d.data.key);
-          var cn=d.data.key;
-          var cid=d.data.values[0].category_id;
-          drawbarcat(col,cn,cid);
-      });
-
-  g.append("text")
-      .attr("transform", function(d) { return "translate(" + labelArc.centroid(d)+")"; })
-      .attr("dy", ".35em")
-      .text(function(d) { return d.data.key; });
-
-}
-    
-    
-function drawbar(data2)
-{
-d3.select("#barcont").selectAll('*').remove();        
-data2 = data2.sort(function (a, b) {
-  if (a.start.utc > b.start.utc) {
-    return 1;
-  }
-  if (a.start.utc < b.start.utc) {
-    return -1;
-  }
-  // a must be equal to b
-  return 0;
-});
-console.log(data2); 
-var mS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];   
-data2 = d3.nest().key(function(d){return d.month;}).sortKeys(function(a,b) { return mS.indexOf(a) - mS.indexOf(b); }).entries(data2);
-console.log(data2);    
-var margin2 = {top: 40, right: 20, bottom: 60, left: 40};
-var width2=$('#barcont').width()- margin2.left - margin2.right;
-var height2=$('#barcont').height()- margin2.top - margin2.bottom;
-var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html(function(d) {
-    return "<span style='color:red'>" + d.values.length + "</span><strong> Events</strong> ";
-  })
-var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width2], .1);
-
-var y = d3.scale.linear()
-    .range([height2, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .ticks(10, "");
-
-var svg = d3.select("#barcont").append("svg")
-    .attr("width", width2 + margin2.left + margin2.right)
-    .attr("height", height2 + margin2.top + margin2.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
-
-//data
-  svg.call(tip);
-  x.domain(data2.map(function(d) { return d.key; }));
-  y.domain([0, d3.max(data2, function(d) { return d.values.length; })]);
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height2 + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Number of Events");
-    
-   svg.append("text")
-            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (width2/2) +","+(-8)+")")  // centre below axis
-            .text("All Categories");
-
-  svg.selectAll(".bar")
-      .data(data2)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.key); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.values.length); })
-      .attr("height", function(d) { return height2 - y(d.values.length); })
-      .attr("fill","steelblue")
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
-
-}
-
-function drawbarcat(col,cn,cid)
-{
-d3.select("#barcont").selectAll('*').remove();    
-data2=totdata;
-data2=data2.filter(function(d){return d.category_id==cid});    
-data2 = data2.sort(function (a, b) {
-  if (a.start.utc > b.start.utc) {
-    return 1;
-  }
-  if (a.start.utc < b.start.utc) {
-    return -1;
-  }
-  // a must be equal to b
-  return 0;
-});
-console.log(data2); 
-var mS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];   
-data2 = d3.nest().key(function(d){return d.month;}).sortKeys(function(a,b) { return mS.indexOf(a) - mS.indexOf(b); }).entries(data2);
-console.log(data2);    
-var margin2 = {top: 20, right: 20, bottom: 30, left: 40};
-var width2=$('#barcont').width()- margin2.left - margin2.right;
-var height2=$('#barcont').height()- margin2.top - margin2.bottom;
-var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html(function(d) {
-    return "<span style='color:red'>" + d.values.length + "</span><strong> Events</strong> ";
-  })
-var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width2], .1);
-
-var y = d3.scale.linear()
-    .range([height2, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .ticks(10, "");
-
-var svg = d3.select("#barcont").append("svg")
-    .attr("width", width2 + margin2.left + margin2.right)
-    .attr("height", height2 + margin2.top + margin2.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
-
-//data
-svg.call(tip);
-  x.domain(data2.map(function(d) { return d.key; }));
-  y.domain([0, d3.max(data2, function(d) { return d.values.length; })]);
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height2 + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Number of Events");
- svg.append("text")
-            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (width2/2) +","+(-8)+")")  // centre below axis
-            .text(cn);
-
-  svg.selectAll(".bar")
-      .data(data2)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.key); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.values.length); })
-      .attr("height", function(d) { return height2 - y(d.values.length); })
-      .attr("fill",col)
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
-
-}    
 </script>    
-    
 </html>
