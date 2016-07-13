@@ -1,17 +1,17 @@
-    
+
 function drawpie(data)
 {
-d3.select("#piecont").selectAll('*').remove();     
-var data = d3.nest().key(function(d) 
+d3.select("#piecont").selectAll('*').remove();
+var data = d3.nest().key(function(d)
                                       {
                                         if(d.category_id==null)
                                          return "199";
                                         else
-                                        return d.category_id;    
+                                        return d.category_id;
                                       })
 .entries(data);
-            
-            
+
+
         data.forEach(function(d)
         {
             for(k=0;k<cate.length;k++)
@@ -19,7 +19,7 @@ var data = d3.nest().key(function(d)
                 {
                     d.key=cate[k].name;
                 }
-        });    
+        });
 var margin = {top: 20, right: 20, bottom: 10, left: 40};
 var width=$('#piecont').width()- margin.left - margin.right;
 var height=$('#piecont').height()- margin.top - margin.bottom;
@@ -44,11 +44,11 @@ var svg = d3.select("#piecont").append("svg")
     .attr("height", height)
   .append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-    
+
 svg.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (0) +","+(-height/2.38)+")")  // centre below axis
-            .text("Click on the pie to see number of events in particular category");    
+            .attr("transform", "translate("+ (0) +","+(-height/2.2)+")")  // centre below axis
+            .text("Click on the pie to see number of events in particular category");
   var g = svg.selectAll(".arc")
       .data(pie(data))
     .enter().append("g")
@@ -70,5 +70,3 @@ svg.append("text")
       .text(function(d) { return d.data.key; });
 
 }
-    
- 
