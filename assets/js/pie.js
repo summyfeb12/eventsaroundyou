@@ -45,10 +45,10 @@ var svg = d3.select("#piecont").append("svg")
   .append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-// svg.append("text")
-//             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-//             .attr("transform", "translate("+ (0) +","+(-height/2.35)+")")  // centre below axis
-//             .text("Click on the pie to see number of events in particular category");
+svg.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate("+ (0) +","+(-height/2.4)+")")  // centre below axis
+            .text("Click on the pie to see number of events in particular category");
   var g = svg.selectAll(".arc")
       .data(pie(data))
     .enter().append("g")
