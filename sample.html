@@ -113,7 +113,7 @@ function events(lat,lng)
 {
 
     var pdata=[];
-	genreurl = 'https://www.eventbriteapi.com/v3/events/search/?location.within=2mi&location.latitude='+lat+'&location.longitude='+lng+'&token=6O64CD5BLMBEDU274QZ6';
+	genreurl = 'https://www.eventbriteapi.com/v3/events/search/?location.within=1.5mi&location.latitude='+lat+'&location.longitude='+lng+'&token=6O64CD5BLMBEDU274QZ6';
 	$.ajax({
 	url : genreurl,
 	async: false,
